@@ -464,14 +464,14 @@ void write_sei_payload( h264_stream_t* h, bs_t* b )
     switch( s->payloadType )
     {
         case SEI_TYPE_SCALABILITY_INFO:
-            if( 0 )
+            if( /* DISABLES CODE */ (0) )
             {
                 s->sei_svc = (sei_scalability_info_t*)calloc( 1, sizeof(sei_scalability_info_t) );
             }
             write_sei_scalability_info( h, b );
             break;
         default:
-            if( 0 )
+            if( /* DISABLES CODE */ (0) )
             {
                 s->data = (uint8_t*)calloc(1, s->payloadSize);
             }

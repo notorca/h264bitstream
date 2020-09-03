@@ -145,7 +145,7 @@ typedef struct
     };
 } sei_t;
 
-sei_t* sei_new();
+sei_t* sei_new(void);
 void sei_free(sei_t* s);
 
 //D.1 SEI payload syntax

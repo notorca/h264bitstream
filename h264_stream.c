@@ -32,6 +32,8 @@
 
 FILE* h264_dbgfile = NULL;
 
+#define HAVE_SEI 1
+
 #define printf(...) fprintf((h264_dbgfile == NULL ? stdout : h264_dbgfile), __VA_ARGS__)
 
 /** 
@@ -172,7 +174,7 @@ int read_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
         if (rc < 0) { free(rbsp_buf); return -1; } // handle conversion error
     }
 
-    if( 0 )
+    if( /* DISABLES CODE */ (0) )
     {
         rbsp_size = size*3/4; // NOTE this may have to be slightly smaller (3/4 smaller, worst case) in order to be guaranteed to fit
     }
@@ -289,7 +291,7 @@ int read_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
 
     if (bs_overrun(b)) { bs_free(b); free(rbsp_buf); return -1; }
 
-    if( 0 )
+    if( /* DISABLES CODE */ (0) )
     {
         // now get the actual size used
         rbsp_size = bs_pos(b);
@@ -474,7 +476,7 @@ void read_scaling_list(bs_t* b, int* scalingList, int sizeOfScalingList, int* us
     {
         if( nextScale != 0 )
         {
-            if( 0 )
+            if( /* DISABLES CODE */ (0) )
             {
                 nextScale = scalingList[ j ];
                 if (useDefaultScalingMatrixFlag[0]) { nextScale = 0; }
@@ -783,7 +785,7 @@ void read_pic_parameter_set_rbsp(h264_stream_t* h, bs_t* b)
 
     int have_more_data = 0;
     if( 1 ) { have_more_data = more_rbsp_data(b); }
-    if( 0 )
+    if( /* DISABLES CODE */ (0) )
     {
         have_more_data = pps->transform_8x8_mode_flag | pps->pic_scaling_matrix_present_flag | pps->second_chroma_qp_index_offset != 0;
     }
@@ -910,7 +912,7 @@ void read_slice_layer_rbsp(h264_stream_t* h,  bs_t* b)
     {
         if ( slice_data->rbsp_buf != NULL ) free( slice_data->rbsp_buf ); 
         uint8_t *sptr = b->p + (!!b->bits_left); // CABAC-specific: skip alignment bits, if there are any
-        slice_data->rbsp_size = b->end - sptr;
+        slice_data->rbsp_size = (int)(b->end - sptr);
         
         slice_data->rbsp_buf = (uint8_t*)malloc(slice_data->rbsp_size);
         memcpy( slice_data->rbsp_buf, sptr, slice_data->rbsp_size );
@@ -1521,7 +1523,7 @@ int write_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
     int rbsp_size = size;
     uint8_t* rbsp_buf = (uint8_t*)calloc(1, rbsp_size);
 
-    if( 0 )
+    if( /* DISABLES CODE */ (0) )
     {
         int rc = nal_to_rbsp(buf, &nal_size, rbsp_buf, &rbsp_size);
 
@@ -1574,7 +1576,7 @@ int write_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
             write_seq_parameter_set_rbsp(h->sps, b);
             write_rbsp_trailing_bits(b);
             
-            if( 0 )
+            if( /* DISABLES CODE */ (0) )
             {
                 if (h->sps->seq_parameter_set_id < 0 || h->sps->seq_parameter_set_id >= 32) { bs_free(b); free(rbsp_buf); return -1; }
                 memcpy(h->sps_table[h->sps->seq_parameter_set_id], h->sps, sizeof(sps_t));
@@ -1607,7 +1609,7 @@ int write_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
             write_subset_seq_parameter_set_rbsp(h->sps_subset, b);
             write_rbsp_trailing_bits(b);
             
-            if( 0 )
+            if( /* DISABLES CODE */ (0) )
             {
                 if (0 <= h->sps_subset->sps->seq_parameter_set_id && h->sps_subset->sps->seq_parameter_set_id < 32) {
                     //memcpy(h->sps_subset_table[h->sps_subset->sps->seq_parameter_set_id], h->sps_subset, sizeof(sps_subset_t));
@@ -1835,13 +1837,13 @@ void write_scaling_list(bs_t* b, int* scalingList, int sizeOfScalingList, int* u
 
             bs_write_se(b, delta_scale);
 
-            if( 0 )
+            if( /* DISABLES CODE */ (0) )
             {
                 nextScale = ( lastScale + delta_scale + 256 ) % 256;
                 useDefaultScalingMatrixFlag[0] = ( j == 0 && nextScale == 0 );
             }
         }
-        if( 0 )
+        if( /* DISABLES CODE */ (0) )
         {
             scalingList[ j ] = ( nextScale == 0 ) ? lastScale : nextScale;
         }
@@ -2126,7 +2128,7 @@ void write_pic_parameter_set_rbsp(h264_stream_t* h, bs_t* b)
     bs_write_u1(b, pps->redundant_pic_cnt_present_flag);
 
     int have_more_data = 0;
-    if( 0 ) { have_more_data = more_rbsp_data(b); }
+    if( /* DISABLES CODE */ (0) ) { have_more_data = more_rbsp_data(b); }
     if( 1 )
     {
         have_more_data = pps->transform_8x8_mode_flag | pps->pic_scaling_matrix_present_flag | pps->second_chroma_qp_index_offset != 0;
@@ -2159,7 +2161,7 @@ void write_pic_parameter_set_rbsp(h264_stream_t* h, bs_t* b)
         bs_write_se(b, pps->second_chroma_qp_index_offset);
     }
 
-    if( 0 )
+    if( /* DISABLES CODE */ (0) )
     {
         if (0 <= pps->pic_parameter_set_id && pps->pic_parameter_set_id < 256)
             memcpy(h->pps_table[pps->pic_parameter_set_id], h->pps, sizeof(pps_t));
@@ -2254,7 +2256,7 @@ void write_slice_layer_rbsp(h264_stream_t* h,  bs_t* b)
     {
         if ( slice_data->rbsp_buf != NULL ) free( slice_data->rbsp_buf ); 
         uint8_t *sptr = b->p + (!!b->bits_left); // CABAC-specific: skip alignment bits, if there are any
-        slice_data->rbsp_size = b->end - sptr;
+        slice_data->rbsp_size = (int)(b->end - sptr);
         
         slice_data->rbsp_buf = (uint8_t*)malloc(slice_data->rbsp_size);
         memcpy( slice_data->rbsp_buf, sptr, slice_data->rbsp_size );
@@ -2871,7 +2873,7 @@ int read_debug_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
         if (rc < 0) { free(rbsp_buf); return -1; } // handle conversion error
     }
 
-    if( 0 )
+    if( /* DISABLES CODE */ (0) )
     {
         rbsp_size = size*3/4; // NOTE this may have to be slightly smaller (3/4 smaller, worst case) in order to be guaranteed to fit
     }
@@ -2988,7 +2990,7 @@ int read_debug_nal_unit(h264_stream_t* h, uint8_t* buf, int size)
 
     if (bs_overrun(b)) { bs_free(b); free(rbsp_buf); return -1; }
 
-    if( 0 )
+    if( /* DISABLES CODE */ (0) )
     {
         // now get the actual size used
         rbsp_size = bs_pos(b);
@@ -3173,7 +3175,7 @@ void read_debug_scaling_list(bs_t* b, int* scalingList, int sizeOfScalingList, i
     {
         if( nextScale != 0 )
         {
-            if( 0 )
+            if( /* DISABLES CODE */ (0) )
             {
                 nextScale = scalingList[ j ];
                 if (useDefaultScalingMatrixFlag[0]) { nextScale = 0; }
@@ -3491,7 +3493,7 @@ void read_debug_pic_parameter_set_rbsp(h264_stream_t* h, bs_t* b)
 
     int have_more_data = 0;
     if( 1 ) { have_more_data = more_rbsp_data(b); }
-    if( 0 )
+    if( /* DISABLES CODE */ (0) )
     {
         have_more_data = pps->transform_8x8_mode_flag | pps->pic_scaling_matrix_present_flag | pps->second_chroma_qp_index_offset != 0;
     }
@@ -3618,7 +3620,7 @@ void read_debug_slice_layer_rbsp(h264_stream_t* h,  bs_t* b)
     {
         if ( slice_data->rbsp_buf != NULL ) free( slice_data->rbsp_buf ); 
         uint8_t *sptr = b->p + (!!b->bits_left); // CABAC-specific: skip alignment bits, if there are any
-        slice_data->rbsp_size = b->end - sptr;
+        slice_data->rbsp_size = (int)(b->end - sptr);
 
         if ( slice_data->rbsp_size > 0 )
         {
